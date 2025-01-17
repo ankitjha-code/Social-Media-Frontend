@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Card, CardContent, CardHeader } from "./ui/card";
 
 interface Submission {
@@ -33,10 +33,11 @@ const AdminDashboard = () => {
         );
         setSubmissions(response.data);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching submissions:", error);
+      } catch (error: unknown) {
+        const axiosError = error as AxiosError;
+        console.error("Error fetching submissions:", axiosError.message);
         setLoading(false);
-        if (error.response?.status === 401) {
+        if (axiosError.response?.status === 401) {
           navigate("/admin/login");
         }
       }

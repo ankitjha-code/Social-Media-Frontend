@@ -1,6 +1,6 @@
 import { useState, FormEvent, ChangeEvent } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
 import { Alert, AlertDescription } from "./ui/alert";
@@ -39,8 +39,12 @@ const UserSubmissionForm = () => {
       await axios.post(`${import.meta.env.VITE_URL}/submissions/add`, data);
       setStatus({ type: "success", message: "Submission successful!" });
       setFormData({ name: "", socialHandle: "", images: null });
-    } catch (error) {
-      setStatus({ type: "error", message: "Error submitting form" });
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError;
+      setStatus({
+        type: "error",
+        message: axiosError.response?.data?.message || "Error submitting form",
+      });
     }
   };
 

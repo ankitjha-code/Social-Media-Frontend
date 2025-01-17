@@ -1,6 +1,6 @@
 import { useState, FormEvent, ChangeEvent } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
 import { Alert, AlertDescription } from "./ui/alert";
@@ -28,8 +28,9 @@ const AdminLogin = () => {
       );
       localStorage.setItem("adminToken", response.data.token);
       navigate("/admin/dashboard");
-    } catch (error) {
-      setError("Invalid credentials");
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError;
+      setError(axiosError.response?.data?.message || "Invalid credentials");
     }
   };
 
