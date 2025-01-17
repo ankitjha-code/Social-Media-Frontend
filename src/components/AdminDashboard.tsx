@@ -4,9 +4,16 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { Card, CardContent, CardHeader } from "./ui/card";
 
+interface Submission {
+  _id: string;
+  name: string;
+  socialHandle: string;
+  images: string[];
+}
+
 const AdminDashboard = () => {
-  const [submissions, setSubmissions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {

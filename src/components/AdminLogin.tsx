@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { Card, CardContent, CardHeader } from "./ui/card";
@@ -6,15 +6,20 @@ import { Input } from "./ui/input";
 import { Alert, AlertDescription } from "./ui/alert";
 import { useNavigate } from "react-router-dom";
 
+interface Credentials {
+  username: string;
+  password: string;
+}
+
 const AdminLogin = () => {
-  const [credentials, setCredentials] = useState({
+  const [credentials, setCredentials] = useState<Credentials>({
     username: "",
     password: "",
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -26,6 +31,11 @@ const AdminLogin = () => {
     } catch (error) {
       setError("Invalid credentials");
     }
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -47,11 +57,10 @@ const AdminLogin = () => {
                   Username
                 </label>
                 <Input
+                  name="username"
                   type="text"
                   value={credentials.username}
-                  onChange={(e) =>
-                    setCredentials({ ...credentials, username: e.target.value })
-                  }
+                  onChange={handleInputChange}
                   required
                   className="mt-1"
                 />
@@ -62,11 +71,10 @@ const AdminLogin = () => {
                   Password
                 </label>
                 <Input
+                  name="password"
                   type="password"
                   value={credentials.password}
-                  onChange={(e) =>
-                    setCredentials({ ...credentials, password: e.target.value })
-                  }
+                  onChange={handleInputChange}
                   required
                   className="mt-1"
                 />

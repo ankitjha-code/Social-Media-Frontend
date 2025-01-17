@@ -1,34 +1,57 @@
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
 import { Alert, AlertDescription } from "./ui/alert";
 
+interface FormData {
+  name: string;
+  socialHandle: string;
+  images: FileList | null;
+}
+
+interface Status {
+  type: string;
+  message: string;
+}
+
 const UserSubmissionForm = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     socialHandle: "",
-    images: [],
+    images: null,
   });
-  const [status, setStatus] = useState({ type: "", message: "" });
+  const [status, setStatus] = useState<Status>({ type: "", message: "" });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData();
     data.append("name", formData.name);
     data.append("socialHandle", formData.socialHandle);
-    for (let i = 0; i < formData.images.length; i++) {
-      data.append("images", formData.images[i]);
+    if (formData.images) {
+      for (let i = 0; i < formData.images.length; i++) {
+        data.append("images", formData.images[i]);
+      }
     }
 
     try {
       await axios.post(`${import.meta.env.VITE_URL}/submissions/add`, data);
       setStatus({ type: "success", message: "Submission successful!" });
-      setFormData({ name: "", socialHandle: "", images: [] });
+      setFormData({ name: "", socialHandle: "", images: null });
     } catch (error) {
       setStatus({ type: "error", message: "Error submitting form" });
     }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    setFormData((prev) => ({ ...prev, images: files }));
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -52,11 +75,10 @@ const UserSubmissionForm = () => {
                   Name
                 </label>
                 <Input
+                  name="name"
                   type="text"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  onChange={handleInputChange}
                   required
                   className="mt-1"
                 />
@@ -67,11 +89,10 @@ const UserSubmissionForm = () => {
                   Social Media Handle
                 </label>
                 <Input
+                  name="socialHandle"
                   type="text"
                   value={formData.socialHandle}
-                  onChange={(e) =>
-                    setFormData({ ...formData, socialHandle: e.target.value })
-                  }
+                  onChange={handleInputChange}
                   required
                   className="mt-1"
                 />
@@ -83,9 +104,7 @@ const UserSubmissionForm = () => {
                 </label>
                 <Input
                   type="file"
-                  onChange={(e) =>
-                    setFormData({ ...formData, images: e.target.files })
-                  }
+                  onChange={handleFileChange}
                   multiple
                   accept="image/*"
                   className="mt-1"
