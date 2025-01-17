@@ -16,6 +16,10 @@ interface Status {
   message: string;
 }
 
+interface ErrorResponse {
+  message: string;
+}
+
 const UserSubmissionForm = () => {
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -40,7 +44,7 @@ const UserSubmissionForm = () => {
       setStatus({ type: "success", message: "Submission successful!" });
       setFormData({ name: "", socialHandle: "", images: null });
     } catch (error: unknown) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as AxiosError<ErrorResponse>;
       setStatus({
         type: "error",
         message: axiosError.response?.data?.message || "Error submitting form",

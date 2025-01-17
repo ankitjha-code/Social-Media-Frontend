@@ -11,6 +11,10 @@ interface Credentials {
   password: string;
 }
 
+interface ErrorResponse {
+  message: string;
+}
+
 const AdminLogin = () => {
   const [credentials, setCredentials] = useState<Credentials>({
     username: "",
@@ -29,7 +33,7 @@ const AdminLogin = () => {
       localStorage.setItem("adminToken", response.data.token);
       navigate("/admin/dashboard");
     } catch (error: unknown) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as AxiosError<ErrorResponse>;
       setError(axiosError.response?.data?.message || "Invalid credentials");
     }
   };
